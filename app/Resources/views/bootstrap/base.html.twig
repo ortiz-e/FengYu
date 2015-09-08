@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="This is a very lightweight and responsive forum system created by Elvin Ortiz (Georgetown University College 2015). The PHP and HTML are all coded from scratch whereas the CSS is based on the Bootstrap framework.">
+        <meta name="author" content="Elvin Ortiz">
+
+        <title>{% block title %}{{globals.pageTitle}}{% endblock %}</title>
+
+         <!-- Bootstrap core CSS -->
+        <link href="http://127.0.0.1/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Bootstrap theme -->
+        <link href="http://127.0.0.1/css/bootstrap-theme.min.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="http://127.0.0.1/css/navbar-static-top.css" rel="stylesheet">
+        <link href="http://127.0.0.1/css/sticky-footer.css" rel="stylesheet">
+        
+        <!-- Our special font -->
+        <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Roboto:400,300,400italic,500,500italic,700,700italic' rel='stylesheet' type='text/css'>
+        
+        <!-- Bootstrap overwrites -->
+        <link href="http://127.0.0.1/css/extra.css" rel="stylesheet">
+        
+        <!-- Let's get our Javascript libraries -->    
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body class="{{ globals.bodyClasses }}">
+        <!-- Static navbar -->
+        <nav class="navbar navbar-default navbar-static-top navbar-inverse">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#"></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="{{ path('homepage') }}">Home</a></li>
+                <li><a href="about">About</a></li>
+                <li><a href="stats">Stats</a></li>
+                {% if globals.loggedIn %}
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">User Pages <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ url('profileView') }}">View Profile</a></li>
+                    <li><a href="{{ url('editProfileForm') }}">Edit Account</a></li>
+                    <li><a href="#">Friends</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Post Something</li>
+                    <li><a href="#">A New Thread</a></li>
+                    <li><a href="#">A New Poll</a></li>
+                  </ul>
+                </li>
+                {% endif %}
+             </ul>
+              <ul class="nav navbar-nav navbar-right">
+                {% if globals.loggedIn %}
+                <li><a href="{{ path('logout') }}">Sign out</a></li>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('adminPanel') }}">Admin Stuff</a></li>
+                {% endif %}
+                {% else %}
+                <li><a href="{{ path('login_route') }}">Sign in</a></li>
+                <li><a href="{{ path('registerAction') }}">Sign up</a></li>
+                {% endif %}
+              </ul>
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
+        {% block announcement %} {% endblock %}
+        <div class="container-fluid">
+            {% block body %}{% endblock %}
+        </div>
+        <footer class="footer navbar-inverse">
+          <div class="container">
+            <p class="text-muted">{{ globals.versionInfo|raw }}</p>
+          </div>
+        </footer>
+
+        {% if globals.ckeditor %}
+        <script src="http://127.0.0.1/fengyu/ckeditor/ckeditor.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        CKEDITOR.replace( '{{globals.ckeditor}}' );
+        </script>
+        {% endif %}
+        {{ globals.extraJS|raw }}
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="http://127.0.0.1/js/bootstrap.min.js"></script>
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+        <script src="http://127.0.0.1/js/ie10-viewport-bug-workaround.js"></script>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

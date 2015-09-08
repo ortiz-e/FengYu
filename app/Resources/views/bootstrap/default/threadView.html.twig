@@ -1,0 +1,161 @@
+{% extends globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+<div style="width: 25%; display: inline-block;">
+  <a class="btn btn-lg btn-primary" href="{{ url('forumView', {'slug' : thread.forum.slug}) }}" role="button">&laquo; {{ thread.forum.title }}</a>
+</div>
+<div style="width: 75%; display: inline-block; text-align: right; float: right;">
+  <div class="btn-group" style="display: inline-block;">
+    <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Thread Options <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      {% if not thread.poll %}
+      <li><a href="{{ url('newPoll', { 'slug' : thread.slug}) }}">Add a Poll</a></li>
+      {% endif %}
+      <li><a href="{{ url('editThread', { 'slug' : thread.slug}) }}">Edit Thread</a></li>
+      <li><a href="#">Close</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a href="#">View Stats</a></li>
+    </ul>
+  </div>
+  <a class="btn btn-lg btn-primary" role="button" href="{{ url('newComment', {'slug' : thread.slug}) }}">New Reply</a>
+</div>
+
+{% if thread.poll %}
+<div class="panel panel-primary" style="margin-top: 10px;">
+  <div class="panel-heading">Poll: <i>{{ thread.poll.title }}</i></div>
+  {% for choice in thread.poll.choices %}
+    {% if totalVotes == 0 %}
+      {% set size = 0 %}
+    {% else %}
+      {% set size = (choice.votes|length / totalVotes) * 100 %}
+    {% endif %}
+    <div class="row" style="margin-left: 0px; margin-right: 0px; border-bottom: 1px solid; border-color: #337ab7; {% if myChoice == choice.id %} background-color: #d5f5d5; {% endif %}">
+      <div class="col-md-2" style="border: 0;">{% if canIVote %} <a href="{{ url('newVote', {'slug' : thread.slug, 'id' : choice.id}) }}">{{ choice.title }}</a> {% else %} {{ choice.title }} {% endif %}</div>
+      <div class="col-md-10">
+          <div class="progress">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ size }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ size }}%;">
+           {% if choice.votes|length > 0 %} {{ choice.votes|length }} vote{% if choice.votes|length != 1 %}s{% endif %}, {{ size|round }}% {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  <div class="row">
+    <div class="col-md-12" style="padding-left: 25px">
+    {{ thread.poll.description }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="alert alert-success" style="display: none;" id="ratingSuccess" role="alert">Your rating for this thread has been recorded successfully</div>
+<div class="alert alert-danger" style="display: none;" id="ratingFail" role="alert">An error has occured while saving your rating. Please try again later.</div>
+
+<div class="panel panel-primary" style="margin-top: 10px;">
+  <div class="panel-heading">
+      Posts in Thread: <i>{{ thread.title }}</i>
+      <div id="stars" style="float: right;">
+        <span id="star-1" class="glyphicon glyphicon-star{% if rating < 1  %}-empty{% endif %}" style="font-size: 18px; color: #ffff00" aria-hidden="true"></span>
+        <span id="star-2" class="glyphicon glyphicon-star{% if rating < 2  %}-empty{% endif %}" style="font-size: 18px; color: #ffff00" aria-hidden="true"></span>
+        <span id="star-3" class="glyphicon glyphicon-star{% if rating < 3  %}-empty{% endif %}" style="font-size: 18px; color: #ffff00" aria-hidden="true"></span>
+        <span id="star-4" class="glyphicon glyphicon-star{% if rating < 4  %}-empty{% endif %}" style="font-size: 18px; color: #ffff00" aria-hidden="true"></span>
+        <span id="star-5" class="glyphicon glyphicon-star{% if rating < 5  %}-empty{% endif %}" style="font-size: 18px; color: #ffff00" aria-hidden="true"></span>
+      </div>
+  </div>
+  <div class="row" style="margin-left: 0px; margin-right: 0px; border-bottom: 1px solid; border-color: #337ab7;">
+      <div class="col-md-2 comment-author-column">
+          <div class="visible-xs-inline visible-sm-inline">Posted by <a href="{{ url('profileView', { 'id' : thread.author.id }) }}">{{ thread.author.username }}</a> on {{ thread.publishDate|date(globals.dateFormat) }}
+          </div>
+          {% set lastpost = thread.author.comments|last %}
+          <div class="visible-md-block visible-lg-block">
+              <p><a href="{{ url('profileView', { 'id' : thread.author.id }) }}">{{ thread.author.username }}</a></p>
+              {% if thread.author.status %} <p class="small" style="margin-top: -10px;"> {{thread.author.status}} </p> {% endif %}
+              <p class="small">Posts: {{ thread.author.comments|length}}</p>
+              {% if thread.author.userpic %} <img src="{{thread.author.userpic}}" alt="userpic" style="margin: 10px 0px; width: 64px; height: 64px;" /> {% endif %}
+              {% if thread.author.location %} <p class="small">From: {{thread.author.location}} </p> {% endif %}
+              <p class="small">Latest Post: {{lastpost.publishDate|date(globals.dateFormat)}} </p>  
+              <p class="small">Last Seen: {{thread.author.lastActivity|date(globals.dateFormat)}} </p>      
+           </div>   
+      </div>
+      <div class="col-md-10" id="postcolumn" style="margin-top: 0px;">
+        <div class="visible-lg-block visible-md-block" style="margin: 0 -15px;"><p class="small" style="padding: 10px 0 0 10px;">{{ thread.title }} | Posted on {{ thread.publishDate|date(globals.dateFormat) }}</p><hr class="blue-hr"></div>
+        {{thread.post|raw}}
+      </div>
+  </div>
+  {% for post in thread.comments %}
+  <div class="row" style="margin-left: 0px; margin-right: 0px; border-bottom: 1px solid; border-color: #337ab7;">
+      <div class="col-md-2 comment-author-column">
+          <div class="visible-xs-inline visible-sm-inline">Posted by <a href="{{ url('profileView', { 'id' : post.author.id }) }}">{{ post.author.username }}</a> on {{ post.publishDate|date('Y m d') }}
+          </div>
+          {% set last = post.author.comments|last %}
+          <div class="visible-md-block visible-lg-block">
+              <p><a href="{{ url('profileView', { 'id' : post.author.id }) }}">{{ post.author.username }}</a></p>
+              {% if post.author.status %} <p class="small" style="margin-top: -10px;"> {{post.author.status}} </p> {% endif %}
+              <p class="small">Posts: {{ post.author.comments|length}}</p>
+              {% if post.author.userpic %} <img src="{{post.author.userpic}}" alt="userpic" style="margin: 10px 0px; width: 64px; height: 64px;" /> {% endif %}
+              {% if post.author.location %} <p class="small">From: {{post.author.location}} </p> {% endif %}
+              <p class="small">Latest Post: {{last.publishDate|date(globals.dateFormat)}} </p>  
+              <p class="small">Last Seen: {{post.author.lastActivity|date(globals.dateFormat)}} </p>      
+           </div>  
+      </div>
+      <div class="col-md-10" id="postcolumn" style="margin-top: 0px;">
+        <div class="visible-lg-block visible-md-block" style="margin: 0 -15px;">
+          <p class="small" style="padding: 10px 0 0 10px; display: inline-block;">{{ post.title }} | Posted on {{ post.publishDate|date(globals.dateFormat) }}</p>
+          <span style="float:right; margin: 5px 5px 0 0;"><a href="{{ url('newComment', {'slug' : thread.slug, 'quote' : post.id}) }}">Quote</a></span>
+          <hr class="blue-hr">
+        </div>
+        {{ post.text|raw }}
+      </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript">
+  jQuery(document).on('ready', function(){
+    var threadRating = {{ rating }};
+    $('#stars').on('mouseenter', 'span', function(e){
+      var $target = $(e.currentTarget);
+      var id = $target.attr('id');
+      id = id.split('-');
+      var num = id[1];
+      for(var i = 1; i <= 5; i++){
+        if(i <= num)
+           $('#star-' + i).removeClass('glyphicon-star-empty').addClass('glyphicon-star');
+        else 
+           $('#star-' + i).removeClass('glyphicon-star').addClass('glyphicon-star-empty');
+      }
+    });
+    $('#stars').on('mouseleave', function(){
+        for(var i = 1; i <= 5; i++){
+          if(i <= threadRating)
+            $('#star-' + i).removeClass('glyphicon-star-empty').addClass('glyphicon-star');
+          else 
+           $('#star-' + i).removeClass('glyphicon-star').addClass('glyphicon-star-empty');
+        }
+    });
+    $('#stars').on('click', 'span', function(e){
+        var $target = $(e.currentTarget);
+        var id = $target.attr('id');
+        id = id.split('-');
+        var num = id[1];
+        console.log(num);
+        $.post("{{ url('newRating', { 'slug' : thread.slug })}}",               
+                {slug: '{{ thread.slug }}', rating: num}, 
+                function(response){
+                        if(response.code == 100 && response.success){//dummy check
+                          threadRating = response.rating;
+                          $('#ratingSuccess').delay(100).fadeIn(500).delay(2000).fadeOut(3000);
+                        }
+                        else {
+                          $('#ratingFail').delay(100).fadeIn(500).delay(2000).fadeOut(3000);
+                        }
+                }, "json");    
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends globals.isAdminPanel ? globals.themePath ~ "/admin.html.twig" : globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+     <div class="panel panel-primary" style="max-width: 1200px; margin: 0 auto 20px;" role="alert">
+      <div class="panel-heading">Edit User</div>
+      <div class="panel-body">
+        {{ form_start(form) }}
+        {{ form_row(form.username) }}
+        {{ form_row(form.roles) }}
+        <table width="100%">
+        <tbody>
+        <tr>
+            <th>
+	        {{ form_label(form.modForums, 'Forum Moderation')}}
+	        </th>
+	        <th>Read Only</th><th>Close & Sticky</th><th>Edit Posts & Threads</th><th>Add/Edit Announcements</th>
+        </tr>
+ 		{% for key,value in form %}
+ 			{% if key starts with 'modForums-' %}
+ 			<tr>
+ 				<td>{{ form_label(value) }}</td>
+ 				{% for checkbox in value %}
+ 					<td>{{ form_widget(checkbox) }}</td>
+ 				{% endfor %}
+ 			</tr>
+ 			{% endif %}
+ 		{% endfor %}
+ 		</tbody>
+ 		</table>
+
+        {{ form_rest(form) }}
+        {{ form_end(form) }}
+      </div>
+   </div>
+{% endblock %}

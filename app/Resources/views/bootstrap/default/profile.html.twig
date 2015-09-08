@@ -1,0 +1,103 @@
+{% extends globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-5">
+      <div class="well">
+        <h2>{{ user.link | raw }}</h2>
+                <div class="row">
+          <div class="col-md-3">{{user.comments|length}} Posts</div>
+          <div class="col-md-3">{{user.blogs|length}} Threads</div>
+          <div class="col-md-3">1 Reputation</div>
+          <div class="col-md-3">{{ user.views }} Views</div>
+        </div>
+       </div>
+       <div class="panel panel-primary">
+        <div class="panel-heading">Info</div>
+        <table class="table table-hover">
+        {% set lastpost = user.comments|last %}
+          <tbody>
+            <tr> 
+              <td>Member since: {{user.joinDate|date(globals.dateFormat)}} ({{user.days}} days ago)</td>
+            </tr>
+            <tr> 
+              <td>Location: {{user.location}}</td>
+            </tr>
+            <tr> 
+              <td>Last activity: {{user.lastActivity|date(globals.dateFormat)}}</td>
+            </tr>
+            <tr> 
+              <td>Last post: {% if user.comments|first %} {{lastpost.publishDate|date(globals.dateFormat)}} {% else %} Never {% endif %} </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Favorite Games</div>
+        <div style="padding: 10px;">
+         {% if user.favoriteGames %}
+         {% for game in user.favoriteGames|split(', ') %}
+         <a href="" style="margin: 4px;" class="btn btn-xs btn-success wrap">{{ game }}</a> 
+         {% endfor %}
+         {% endif %}
+        </div>
+      </div>
+      <div class="panel panel-primary">
+        <div class="panel-heading">Currently Playing</div>
+        <div style="padding: 10px;">
+         {% if user.nowPlaying %}
+         {% for game in user.nowPlaying|split(', ') %}
+         <a href="" style="margin: 4px;" class="btn btn-xs btn-success wrap">{{ game }}</a> 
+         {% endfor %}
+         {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+        <div class="panel panel-primary">
+        <div class="panel-heading">Wall</div>
+        <table class="table table-hover">
+          <tbody>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+            <tr> 
+              <td>Something</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

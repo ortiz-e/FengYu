@@ -1,0 +1,10 @@
+{% extends globals.isAdminPanel ? globals.themePath ~ "/admin.html.twig" : globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+     <div class="panel {{ boxClass }}" style="max-width: 700px; margin: 0 auto;" role="alert">
+      <div class="panel-heading">{{ title|default('Info') }}</div>
+      <div class="panel-body">
+        {{ message }}
+      </div>
+   </div>
+{% endblock %}

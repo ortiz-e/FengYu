@@ -1,0 +1,26 @@
+{% extends globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+<div style="width: 100%; text-align: right; margin-bottom: 10px;"><a class="btn btn-lg btn-primary" role="button" href="{{ url('newThread', {'slug' : forum.slug}) }}">New Thread</a></div>
+<div class="panel panel-primary">
+  <div class="panel-heading">Threads In Forum: {{forum.title}}</div>
+  <table class="table table-hover">
+    <tr>
+      <th style="width: 50%">Thread Title</th>
+      <th style="width: 15%">Author</th>
+      <th style="width: 5%">Replies</th>
+      <th style="width: 30%">Last Reply</th>
+    </tr>
+     {% for blog in forum.blogs %}
+     {% set lastpost = blog.comments|last %}
+    <tr>
+      <td><a href="{{ url('threadView', {'slug' : blog.slug }) }}">{{blog.title}}</a></td>
+      <td><a href="{{ url('profileView', { 'id' : blog.author.id }) }}">{{blog.author.username}}</a></td>
+      <td>{{blog.comments.count}}</td>
+      <td>{% if lastpost %}{{lastpost.publishDate|date(globals.dateFormat)}}<br>By <a href="{{ url('profileView', {'id' : lastpost.author.id})}}">{{lastpost.author.username}}</a>{% else %} None {% endif %}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+
+{% endblock %}

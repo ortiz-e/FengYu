@@ -1,0 +1,24 @@
+{% extends globals.themePath ~ '/base.html.twig' %}
+
+{% block body %}
+  {% if error %}
+    <div class="jumbotron">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{% endif %}
+  <div class="panel panel-primary" style="max-width: 700px; margin: 0 auto;" role="alert">
+    <div class="panel-heading">Login Form</div>
+    <div class="panel-body">
+    <form action="{{ path('login_verify') }}" method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="_username" class="form-control" id="username" value="{{ last_username }}">
+      </div>
+      <div class="form-group">
+        <label for="inputPassword">Password</label>
+        <input type="password" name="_password" class="form-control" id="inputPassword" placeholder="Enter password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+    </form>
+   </div>
+ </div>
+
+{% endblock %}
