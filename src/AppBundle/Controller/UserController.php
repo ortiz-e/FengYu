@@ -80,11 +80,17 @@ class UserController extends Controller
 	            ->getRepository('AppBundle:Category')
 	            ->findBy(array(), array('weight' => 'ASC'));
 	            foreach($cats as $cat){
-	            	foreach($cat->getForums() as $forum)
-	            		$form = $form->add($forum->getSlug(), 'choice', array(
+	            	foreach($cat->getForums() as $forum){
+	            		$user->__set('modForums-' . $forum->getSlug(), array(1));
+	            		$form = $form->add('modForums-' . $forum->getSlug(), 
+	            			'choice', 
+	            			array(
+	            			'label' => $forum->getTitle(),
 	            			'multiple' => true,
 	            			'expanded' => true,
-	            			'choices' => array('0' => 'Read Only', '1' => 'Close/Sticky', '2' => 'Edit Posts/Threads', '3' => 'Add/Edit Announcements')));
+	            			'choices' => array('0' => 'Read Only', '1' => 'Close/Sticky', '2' => 'Edit Posts/Threads', '3' => 'Add/Edit Announcements'))
+	            			);
+	            	}
 	            }
 			}
 		}

@@ -156,6 +156,14 @@ class User implements UserInterface, \Serializable {
     	$this->isActive = true;
     }
 
+    public function __get($name){
+       return $name;
+    }
+
+    public function __set($name, $value){
+        $this->{$name} = $value;
+    }
+
 
     public function getSalt()
     {
