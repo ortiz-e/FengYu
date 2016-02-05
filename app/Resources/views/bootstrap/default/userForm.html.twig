@@ -5,29 +5,31 @@
       <div class="panel-heading">Edit User</div>
       <div class="panel-body">
         {{ form_start(form) }}
-        {{ form_row(form.username) }}
-        {{ form_row(form.roles) }}
-        <table width="100%">
-        <tbody>
-        <tr>
-            <th>
-	        Forum Moderation
-	        </th>
-	        <th>Read Only</th><th>Close & Sticky</th><th>Edit Posts & Threads</th><th>Add/Edit Announcements</th>
-        </tr>
- 		{% for key,value in form %}
- 			{% if key starts with 'modForums-' %}
- 			<tr>
- 				<td>{{ form_label(value) }}</td>
- 				{% for checkbox in value %}
- 					<td>{{ form_widget(checkbox) }}</td>
- 				{% endfor %}
- 			</tr>
- 			{% endif %}
- 		{% endfor %}
- 		</tbody>
- 		</table>
-
+        {% if globals.isAdmin %}
+            {{ form_row(form.username) }}
+            {{ form_row(form.roles) }}
+            <table width="100%">
+              <tbody>
+                <tr>
+                  <th>Forum Moderation</th>
+        	        <th>Read Only</th>
+                  <th>Close & Sticky</th>
+                  <th>Edit Posts & Threads</th>
+                  <th>Add/Edit Announcements</th>
+                </tr>
+             		{% for key,value in form %}
+             			{% if key starts with 'modForums-' %}
+               			<tr>
+               				<td>{{ form_label(value) }}</td>
+               				{% for checkbox in value %}
+               				<td>{{ form_widget(checkbox) }}</td>
+               				{% endfor %}
+               			</tr>
+             			{% endif %}
+             		{% endfor %}
+           		</tbody>
+         		</table>
+        {% endif %}
         {{ form_rest(form) }}
         {{ form_end(form) }}
       </div>

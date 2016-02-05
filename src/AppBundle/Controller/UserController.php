@@ -74,25 +74,24 @@ class UserController extends Controller
 						'ROLE_MODERATOR' => 'Moderator', 
 						'ROLE_USER' => 'Regular User', 
 						'ROLE_BANNED' => 'Banned')));
-			if(!$user->getModForums()){
-				$user->setModForums(array());
-				$cats = $this->getDoctrine()
-	            ->getRepository('AppBundle:Category')
-	            ->findBy(array(), array('weight' => 'ASC'));
-	            foreach($cats as $cat){
-	            	foreach($cat->getForums() as $forum){
-	            		$user->__set('modForums-' . $forum->getSlug(), array(1));
-	            		$form = $form->add('modForums-' . $forum->getSlug(), 
-	            			'choice', 
-	            			array(
-	            			'label' => $forum->getTitle(),
-	            			'multiple' => true,
-	            			'expanded' => true,
-	            			'choices' => array('0' => 'Read Only', '1' => 'Close/Sticky', '2' => 'Edit Posts/Threads', '3' => 'Add/Edit Announcements'))
-	            			);
-	            	}
-	            }
-			}
+			if(!$user->getModForums()) $user->setModForums(array(0));
+			$modForums = $user->getModForums();
+			$cats = $this->getDoctrine()
+            ->getRepository('AppBundle:Category')
+            ->findBy(array(), array('weight' => 'ASC'));
+            foreach($cats as $cat){
+            	foreach($cat->getForums() as $forum){
+            		$user->__set('modForums-' . $forum->getSlug(), array_key_exists($forum->getSlug(), $modForums) ? $modForums[$forum->getSlug()] : array(0));
+            		$form = $form->add('modForums-' . $forum->getSlug(), 
+            			'choice', 
+            			array(
+            			'label' => $forum->getTitle(),
+            			'multiple' => true,
+            			'expanded' => true,
+            			'choices' => array('0' => 'Read Only', '1' => 'Close/Sticky', '2' => 'Edit Posts/Threads', '3' => 'Add/Edit Announcements'))
+            			);
+            	}
+            }
 		}
 
 		$form = $form
@@ -108,6 +107,7 @@ class UserController extends Controller
 			->add('aboutMe', 'textarea', array('attr' => array('rows' => 25)))
 			->add('save', 'submit', array('label' => 'Save'))
 			->getForm();
+
 		if(!$request->isMethod('POST'))
         {
         	if(Core::isAdmin($this))
@@ -117,8 +117,20 @@ class UserController extends Controller
             return Core::doForm($this, $form, 'Edit your Profile');
         }
         else {
+        	$array = array();
+        	$fdata = $request->request->get('form');
+        	foreach($cats as $cat){
+            	foreach($cat->getForums() as $forum){
+            		$mf = $fdata['modForums-'.$forum->getSlug()];
+            		$array[$forum->getSlug()] = $mf;
+            		unset($fdata['modForums-'.$forum->getSlug()]);
+            	}
+            }
+            $fdata['modForums'] = $array;
+            $request->request->set('form', $fdata);
             $form->bind($request);
             $data = $form->getData();
+            $data->setModForums($array);
             if(in_array('ROLE_ROOT', $data->getRoles()) && $data->getId() !== 1) return Core::redirect($this, 'profileView', array('id' => $id), 'Error!', 'The ROOT role can only be assigned to the root user.');
             $em = $this->getDoctrine()->getManager();
             $em->persist($data);

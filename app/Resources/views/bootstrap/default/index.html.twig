@@ -10,28 +10,28 @@
     	{% if loop.index0 is even %}
     		<div class="row" style="margin-left: 0px; margin-right: 0px;">
     	{% endif %}
-    	<div class="col-md-5 {{ cycle(['', 'col-md-offset-2'], loop.index0) }} forum-entry">
-		    <div class="media">
-		      <div class="media-left">
-		       <!-- <a href="{{ url('forumView', {'slug' : forum.slug}) }}">
-		          <img class="media-object" src="{{ forum.img }}" alt="games" />
-		        </a> -->
-		        </div>
-		        <div class="media-body">
-		          <h4 class="media-heading"><a href="{{ url('forumView', {'slug' : forum.slug}) }}">{{ forum.title }}</a></h4>
-		          <p>{{ forum.info }}</p>
+        	<div class="col-md-5 {{ cycle(['', 'col-md-offset-2'], loop.index0) }} forum-entry">
+    		    <div class="media">
+    		      <div class="media-left">
+    		       <!-- <a href="{{ url('forumView', {'slug' : forum.slug}) }}">
+    		          <img class="media-object" src="{{ forum.img }}" alt="games" />
+    		        </a> -->
+    		      </div>
+    		      <div class="media-body">
+    		          <h4 class="media-heading"><a href="{{ url('forumView', {'slug' : forum.slug}) }}">{{ forum.title }}</a></h4>
+    		          <p>{{ forum.info }}</p>
+    		      </div>
+    		    </div>
 		      </div>
-		    </div>
-		</div>
 		{% if loop.index0 is odd %}
     		</div>
-    	{% endif %}
-    	{% if loop.index0 is even and loop.last %}
-    		</div>
-    	{% endif %}
+    {% endif %}
+    {% if loop.index0 is even and loop.last %}
+    	</div>
+    {% endif %}
     {% endfor %}
-    </div>
-   </div>
+  </div>
+</div>
    {% endif %}
    {% endfor %}
 {% endblock %}

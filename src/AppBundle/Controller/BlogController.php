@@ -21,6 +21,14 @@ use AppBundle\Form\Type\PollType;
 class BlogController extends Controller
 {
     public $slug;
+    const CAN_READ = 0;
+    const CAN_REPLY = 1;
+    const CAN_MAKE_THREAD = 2;
+    const CAN_STICKY = 3;
+    const CAN_CLOSE = 3;
+    const CAN_EDIT_POST = 4;
+    const CAN_EDIT_THREAD = 4;
+    const CAN_ANNOUNCE = 5;
 
     /**
      * @Route("/forum/{slug}", name="forumView")
@@ -58,6 +66,14 @@ class BlogController extends Controller
         $totalVotes = 0;
         $canIRate = false;
         $threadRating = 0;
+
+        if(!Core::hasForumPermission($this, $thread->getForum()->getSlug(), self::CAN_READ))
+            return Core::redirect(
+                $this, 
+                'referer', 
+                null, 
+                'Error!', 
+                'You must be logged in to be able to read threads or posts. You will now be redirected to the previous page.');
 
         //can I vote?
         if($thread->getPoll() and Core::loggedIn($this))
@@ -176,6 +192,14 @@ class BlogController extends Controller
             return Core::redirect(
                 $this, 
                 'referer', null, 'Error!', 'Could not find the forum. Returning you to the previous page.');
+
+        if(!Core::hasForumPermission($this, $slug, self::CAN_READ))
+            return Core::redirect(
+                $this, 
+                'referer', 
+                null, 
+                'Error!', 
+                'You do not have sufficient permissions to perform that action. You will now be redirected to the previous page.');
 
         //create new empty Blog (thread) entity
         $thread = new Blog();

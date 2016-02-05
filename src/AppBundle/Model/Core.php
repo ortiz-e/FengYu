@@ -31,6 +31,13 @@ class Core {
 		return $path;
 	}
 
+	public static function hasForumPermission($context, $forumSlug, $permission)
+	{
+		if(!self::loggedIn($context) and $permission != 0) return false;
+		elseif(!self::loggedIn($context) and $permission == 0) return true;
+		else return in_array($permission, $context->get('security.token_storage')->getToken()->getUser()->getModForums()[$forumSlug]);
+	}
+
 	public static function userLink($context, $user)
 	{
 		return "<a href=\"". $context->get('router')->generate('profileView', array( 'id' => $user->getId())) ."\">". $user->getUsername() ."</a>";
@@ -100,7 +107,8 @@ class Core {
 	    return $route;
 	}
 
-	private static function getRefererParams($context) {
+	private static function getRefererParams($context) 
+	{
         $request = $context->getRequest();
         $referer = $request->headers->get('referer');
         $baseUrl = $request->getBaseUrl();
@@ -115,10 +123,13 @@ class Core {
 		$loggedIn = false;
 		$userLink = "Guest";
 		$userID = 0;
+		$isAdmin = false;
 		if(self::loggedIn($context)){
 			$loggedIn = true;
-			$userLink = self::userLink($context, $context->get('security.token_storage')->getToken()->getUser());	
-			$userID = $context->get('security.token_storage')->getToken()->getUser()->getId();
+			$user = $context->get('security.token_storage')->getToken()->getUser();
+			$userLink = self::userLink($context, $user);	
+			$userID = $user->getId();
+			$isAdmin = in_array('ROLE_ROOT', $user->getRoles()) || in_array('ROLE_ADMIN', $user->getRoles());
 		} 
 
 
@@ -153,6 +164,7 @@ class Core {
 			'pageTitle' => $pageTitle,
 			'myLink' => $userLink,
 			'isAdminPanel' => $isAdminPanel,
+			'isAdmin' => $isAdmin,
 			'ckeditor' => $ckeditor,
 			'bodyClasses' => $bodyClasses,
 			'dateFormat' => 'F d Y H:i',
